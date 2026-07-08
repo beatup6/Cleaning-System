@@ -382,7 +382,7 @@ async function delSession(e,id){
   }catch(err){toast('삭제 실패: '+err.message);}
 }
 function openNewSession(){
-  $('nsTitle').value=`${new Date().getFullYear()}-${String(new Date().getMonth()+1).padStart(2,'0')} 정기 Cleaning`;
+  $('nsTitle').value='출하 전 Cleaning';
   $('mdNew').classList.remove('hidden');
 }
 async function createSession(){
