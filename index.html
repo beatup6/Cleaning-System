@@ -501,6 +501,16 @@ function openNewSession(){
 async function createSession(){
   const eq=$('nsEquip').value.trim(),tt=$('nsTitle').value.trim();
   if(!eq||!tt){toast('설비 NO와 검사 구분을 입력하세요');return;}
+  // 설비 No 중복 차단 (서버에서 최신 목록 재확인)
+  const{data:dups,error:dupErr}=await sb.from('cleaning_sessions').select('id,title,created_by,status').ilike('equipment_no',eq);
+  if(dupErr){toast('중복 확인 실패: '+dupErr.message);return;}
+  if(dups&&dups.length){
+    const d=dups[0];
+    alert(`설비 No [${eq}] 은(는) 이미 등록되어 있습니다.\n\n기존 건: ${d.title} · ${d.created_by} (${d.status})\n\n기존 건을 열어 이어서 작업하거나, 목록에서 삭제 후 다시 만드세요.`);
+    closeModal('mdNew');
+    openSession(dups[0].id);
+    return;
+  }
   const{data,error}=await sb.from('cleaning_sessions').insert({equipment_no:eq,title:tt,created_by:me}).select().single();
   if(error){toast('생성 실패: '+error.message);return;}
   closeModal('mdNew');
